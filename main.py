@@ -29,7 +29,7 @@ def renderPlot(partXs, partYs, partXvel, partYvel, func):
     ax.set_aspect('equal')
     ax.axis([AXISMIN, AXISMAX, AXISMIN, AXISMAX])
 
-    # arange returns array of evenly spaced values (this could be replaced by arrays of positions from the pso algorithm)
+    # arrange returns array of evenly spaced values (this could be replaced by arrays of positions from the pso algorithm)
     x1 = np.arange(0, -0.2, -0.002)
     y1 = np.arange(0, -0.2, -0.002)
     x2 = np.arange(3.9, 3.7, -0.002)
@@ -49,10 +49,10 @@ def renderPlot(partXs, partYs, partXvel, partYvel, func):
 
         ax.quiver(partXs, partYs, partXvel, partYvel, scale=ARROWSIZE)  # draw the arrows
 
-        # line, = ax.plot(x1[0:i], y1[0:i], color='blue', lw=1)  # draws the line the point is traveling
-        # point1, = ax.plot(x1[i], y1[i], marker='.', color='blue')  # draws the moving point
+        line, = ax.plot(x1[0:i], y1[0:i], color='blue', lw=1)  # draws the line the point is traveling
+        point1, = ax.plot(x1[i], y1[i], marker='X', color='blue')  # draws the moving point
 
-        return point1, point2, point3,
+        return point1, line
 
     # plt.show()
 
