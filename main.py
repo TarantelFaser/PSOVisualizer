@@ -14,18 +14,23 @@ def renderPlot(partXs, partYs, partXvel, partYvel, func):
     plt.xlabel('X')
     plt.ylabel('Y')
 
+    # get the contour plot for the function (func : R^2 -> R)
+    xf = np.linspace(AXISMIN, AXISMAX, DOTS)
+    yf = np.linspace(AXISMIN, AXISMAX, DOTS)
+    Xf, Yf = np.meshgrid(xf, yf)
+    cf = ax.contourf(Xf, Yf, func(Xf, Yf))
+    fig.colorbar(cf, ax=ax)
+
+    # draw the velocity arrows
     ax.quiver(partXs, partYs, partXvel, partYvel, scale=ARROWSIZE)
     ax.set_title('Particle Swarm Optimization')
     ax.set_aspect('equal')
     ax.axis([AXISMIN, AXISMAX, AXISMIN, AXISMAX])
 
-    # get the contour plot for the function (func : R^2 -> R)
-    xf = np.linspace(AXISMIN, AXISMAX, DOTS)
-    yf = np.linspace(AXISMIN, AXISMAX, DOTS)
-    Xf, Yf = np.meshgrid(xf, yf)
-    ax.contour(Xf, Yf, func(Xf, Yf))
-
     plt.show()
+
+    # TODO marker (Kreuze oder so im Diagramm)
+    # TODO animation oder alternativ viele einzelne PNGs zusammen zu einem GIF
 
 def rosenbrock_function(x, y):
     a = 1
@@ -51,9 +56,12 @@ def quadratic_function(x, y):
 
 
 if __name__ == '__main__':
+    # positions of particles
     X = [1, 2, 3, 4]
     Y = [5, 2, 8, 1]
 
+    # velocities of particles
     xVel = [1, 2, 3, -2]
     yVel = [2, 5, -3, 0]
+
     renderPlot(X, Y, xVel, yVel, quadratic_function)
