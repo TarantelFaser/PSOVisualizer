@@ -20,24 +20,18 @@ def renderPlot(partXs, partYs, partXvel, partYvel, func):
     xf = np.linspace(AXISMIN, AXISMAX, DOTS)
     yf = np.linspace(AXISMIN, AXISMAX, DOTS)
     Xf, Yf = np.meshgrid(xf, yf)
-    cf = ax.contourf(Xf, Yf, func(Xf, Yf))
-    fig.colorbar(cf, ax=ax)
 
-    # draw the velocity arrows
-    ax.quiver(partXs, partYs, partXvel, partYvel, scale=ARROWSIZE)
-    ax.set_title('Particle Swarm Optimization')
-    ax.set_aspect('equal')
-    ax.axis([AXISMIN, AXISMAX, AXISMIN, AXISMAX])
+
 
     # arrange returns array of evenly spaced values (this could be replaced by arrays of positions from the pso algorithm)
-    x1 = np.arange(0, -0.2, -0.002)
-    y1 = np.arange(0, -0.2, -0.002)
-    x2 = np.arange(3.9, 3.7, -0.002)
-    y2 = np.arange(0, 1, 0.01)
-    x3 = np.arange(0, 1.8, 0.018)
-    y3 = np.array(x3 ** 2)
+    x1 = np.arange(0, -2, -0.02)
+    y1 = x1 ** 2
+    #x1 = np.arange(0, -0.2, -0.002)
+    #y1 = np.arange(0, -0.2, -0.002)
 
     fig, ax = plt.subplots()
+    #draw arrows
+    Q = ax.quiver(x1, y1, x1, y1, scale=ARROWSIZE)  # draw the arrows
 
     # gets called with i as the frame number
     def animate(i):
@@ -47,7 +41,10 @@ def renderPlot(partXs, partYs, partXvel, partYvel, func):
         ax.set_aspect('equal')
         ax.axis([AXISMIN, AXISMAX, AXISMIN, AXISMAX])
 
-        ax.quiver(partXs, partYs, partXvel, partYvel, scale=ARROWSIZE)  # draw the arrows
+        # draw the velocity arrows (see websites)
+        # Q.set
+        # https://stackoverflow.com/questions/19329039/plotting-animated-quivers-in-python
+        # https://matplotlib.org/3.1.1/api/_as_gen/matplotlib.axes.Axes.quiver.html
 
         line, = ax.plot(x1[0:i], y1[0:i], color='blue', lw=1)  # draws the line the point is traveling
         point1, = ax.plot(x1[i], y1[i], marker='X', color='blue')  # draws the moving point
@@ -56,11 +53,10 @@ def renderPlot(partXs, partYs, partXvel, partYvel, func):
 
     # plt.show()
 
-    ani = FuncAnimation(fig, animate, interval=40, blit=True, repeat=True, frames=100)
+    ani = FuncAnimation(fig, animate, interval=40, blit=False, repeat=True, frames=100)
     ani.save("TLI.gif", dpi=300, writer=PillowWriter(fps=FPS))
 
-    # TODO marker (Kreuze oder so im Diagramm)
-    # TODO animation oder alternativ viele einzelne PNGs zusammen zu einem GIF
+    print("Animation saved")
 
 
 def rosenbrock_function(x, y):
