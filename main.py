@@ -53,18 +53,25 @@ def renderPlot(pos, vel, func):
     ani.save("TLI.gif", dpi=300, writer=PillowWriter(fps=FPS))
     print("Animation saved")
 
-def standardParticleSwarmOptimization(swarmSize, func, c1 = 1.5, c2 = 1.5, w = 1):
-    particles = [[] for i in range(0, ITERATIONS)] # in the first element is the positional data of all the particles in the first iteration
-    velocities = [[] for i in range(0, ITERATIONS)]
-    personalBests = [[] for i in range(0, swarmSize)]
+def standardParticleSwarmOptimization(swarmSize, func, c1 = 0.1, c2 = 0.1, w = 0.1):
+    particles = [] # in the first element is the positional data of all the particles in the first iteration
+    velocities = []
+    personalBests = []
     globalBest = []
+
+    # append arrays for first iteration
+    particles.append([])
+    velocities.append([])
+
     for i in range(swarmSize):
-        particles[0].append([])
-        velocities[0].append([])
-        particles[0][i] = [0, i]
-        personalBests[i] = particles[0][i]
-        velocities[0][i] = [0, 0]
+        particles[0].append([0, i])
+        velocities[0].append([0, 0])
+        personalBests.append(particles[0][i])
+
     globalBest = particles[0][0]
+
+    print(particles)
+    print(velocities)
 
     for i in range(swarmSize):
         if func(particles[0][i][0], particles[0][i][1]) < func(globalBest[0], globalBest[1]):
@@ -72,19 +79,21 @@ def standardParticleSwarmOptimization(swarmSize, func, c1 = 1.5, c2 = 1.5, w = 1
 
     t = 1
     while t < ITERATIONS:
+        particles.append([])
+        velocities.append([])
         print(t)
         for i in range(swarmSize):
-            particles[t].append([])
-            velocities[t].append([])
 
+            #compute new velocities
             r1 = random.random()
             r2 = random.random()
-            origVel = w * velocities[t-1]
-            cogComp = [c1*r1*personalBests[i][0]-particles[t-1][i][0], c1*r1*personalBests[i][1]-particles[t-1][i][1]]
-            socComp = [c2*r2*globalBest[0] - particles[t-1][i][0], c2*r2*globalBest[1] - particles[t-1][i][1]]
-            velocities[t][i] = origVel + cogComp + socComp
+            origVel = [w * velocities[t-1][i][0], w * velocities[t-1][i][1]]
+            cogComp = [c1*r1*(personalBests[i][0]-particles[t-1][i][0]), c1*r1*(personalBests[i][1]-particles[t-1][i][1])]
+            socComp = [c2*r2*(globalBest[0] - particles[t-1][i][0]), c2*r2*(globalBest[1] - particles[t-1][i][1])]
+            velocities[t].append([origVel[0] + cogComp[0] + socComp[0], origVel[1] + cogComp[1] + socComp[1]])
 
-            particles[t][i] = particles[t-1][i] + velocities[t][i]
+            #compute new positions
+            particles[t].append([particles[t-1][i][1] + velocities[t][i][0], particles[t-1][i][1] + velocities[t][i][1]])
 
             if func(particles[t][i][0], particles[t][i][1]) < func(personalBests[i][0], personalBests[i][1]):
                 personalBests[i] = particles[t][i]
@@ -94,7 +103,7 @@ def standardParticleSwarmOptimization(swarmSize, func, c1 = 1.5, c2 = 1.5, w = 1
 
         t = t + 1
 
-    print("vel", velocities[50][0]) #TODO why does this not load?
+    print("vel", velocities[50]) #TODO why does this not load?
     return particles, velocities
 
 
