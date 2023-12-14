@@ -72,6 +72,7 @@ def standardParticleSwarmOptimization(swarmSize, func, c1 = 1.5, c2 = 1.5, w = 1
 
     t = 1
     while t < ITERATIONS:
+        print(t)
         for i in range(swarmSize):
             particles[t].append([])
             velocities[t].append([])
@@ -93,6 +94,7 @@ def standardParticleSwarmOptimization(swarmSize, func, c1 = 1.5, c2 = 1.5, w = 1
 
         t = t + 1
 
+    print("vel", velocities[50][0]) #TODO why does this not load?
     return particles, velocities
 
 
@@ -129,4 +131,5 @@ if __name__ == '__main__':
     yVel = [2, 5, -3, 0]
 
     pos, vel = standardParticleSwarmOptimization(5, quadratic_function, 5)
+    print("done computing, starting rendering now")
     renderPlot(pos, vel, quadratic_function)
