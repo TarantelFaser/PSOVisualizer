@@ -63,16 +63,16 @@ def standardParticleSwarmOptimization(swarmSize, func, c1 = 0.1, c2 = 0.1, w = 0
     particles.append([])
     velocities.append([])
 
+    # initialize positions
     for i in range(swarmSize):
         particles[0].append([0, i])
         velocities[0].append([0, 0])
         personalBests.append(particles[0][i])
 
+    # initialize the global best to the value of the first particle
     globalBest = particles[0][0]
 
-    print(particles)
-    print(velocities)
-
+    # update the global best to the best position of a particle
     for i in range(swarmSize):
         if func(particles[0][i][0], particles[0][i][1]) < func(globalBest[0], globalBest[1]):
             globalBest = particles[0][i]
@@ -81,9 +81,7 @@ def standardParticleSwarmOptimization(swarmSize, func, c1 = 0.1, c2 = 0.1, w = 0
     while t < ITERATIONS:
         particles.append([])
         velocities.append([])
-        print(t)
-        for i in range(swarmSize):
-
+        for i in range(swarmSize): #foreach particle
             #compute new velocities
             r1 = random.random()
             r2 = random.random()
@@ -95,17 +93,17 @@ def standardParticleSwarmOptimization(swarmSize, func, c1 = 0.1, c2 = 0.1, w = 0
             #compute new positions
             particles[t].append([particles[t-1][i][1] + velocities[t][i][0], particles[t-1][i][1] + velocities[t][i][1]])
 
+            #update personal and global bests
             if func(particles[t][i][0], particles[t][i][1]) < func(personalBests[i][0], personalBests[i][1]):
                 personalBests[i] = particles[t][i]
-
             if func(particles[t][i][0], particles[t][i][1]) < func(globalBest[0], globalBest[1]):
                 globalBest = particles[t][i]
 
         t = t + 1
 
-    print("vel", velocities[50]) #TODO why does this not load?
     return particles, velocities
 
+    #TODO velocity clamping is needed asap!
 
 
 def rosenbrock_function(x, y):
