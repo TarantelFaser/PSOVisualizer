@@ -9,12 +9,15 @@ AXISMIN = -10
 AXISMAX = 10
 DOTS = AXISMAX * 10
 FPS = 25
-ITERATIONS = 100
+ITERATIONS = 50  # actual iterations of the algorithm
+STEPSPERIT = 5  # number of substeps animated between two actual iterations of the algorithm
 VMAXFACTOR = 0.1
+PARTPERAXIS = 8  # number of particles spread along one axis, total number will be this number squared
 
 
 # takes arrays of coordinates of particles and the velocities
 # and a function and renders the plot
+# pos array contains a subarray for each particle, containing all the positions
 def renderPlot(pos, vel, func):
     fig, ax = plt.subplots()
     plt.xlabel('X')
@@ -33,19 +36,14 @@ def renderPlot(pos, vel, func):
         ax.set_aspect('equal')
         ax.axis([AXISMIN, AXISMAX, AXISMIN, AXISMAX])
 
-        # line, = ax.plot(x1[0:i], y1[0:i], color='red', lw=1)  # draws the line the point is traveling
-        # point1, = ax.plot(x1[i], y1[i], marker='X', color='red')  # draws the moving point
-
         points = []
-        for j in range(0, len(pos[0])):
-            # xs = np.arange(pos[i][j][0])
-            # for k in range()
-            p = ax.plot(pos[i][j][0], pos[i][j][1], marker='X', color='red')  # draws the moving point
+        for j in range(len(pos)):  # for each particle
+            p = ax.plot(pos[j][i][0], pos[j][i][1], marker='X', color='red')  # draws the moving point
             points.append(p)
-
+        print(f'\r{round((i*100) / ((ITERATIONS - 1) * STEPSPERIT), 1)}%')
         return points
 
-    ani = FuncAnimation(fig, animate, interval=40, blit=False, repeat=True, frames=ITERATIONS)
+    ani = FuncAnimation(fig, animate, interval=40, blit=False, repeat=True, frames=(ITERATIONS - 1) * STEPSPERIT)
     ani.save("TLI.gif", dpi=300, writer=PillowWriter(fps=FPS))
     print("Animation saved")
 
@@ -66,17 +64,19 @@ def getClampedVel(newVel, delta=VMAXFACTOR):
         return newVel
 
 
-def standardParticleSwarmOptimization(func, c1=0.1, c2=0.1, w=0.1):
+def standardParticleSwarmOptimization(func, cC=0.6, cS=1.5, w=0.5):
     particles = []  # in the first element is the positional data of all the particles in the first iteration
     velocities = []
     personalBests = []
+
+    w = 0.5 + (random.random() / 2)
 
     # append arrays for first iteration
     particles.append([])
     velocities.append([])
 
     # initialize positions
-    step = (np.abs(AXISMIN) + np.abs(AXISMAX)) / 8
+    step = (np.abs(AXISMIN) + np.abs(AXISMAX)) / PARTPERAXIS
     x, y = np.arange(AXISMIN, AXISMAX, step), np.arange(AXISMIN, AXISMAX, step)
     partCount = 0
     for a in x:
@@ -106,10 +106,10 @@ def standardParticleSwarmOptimization(func, c1=0.1, c2=0.1, w=0.1):
             r2 = random.random()
             origVel = [w * velocities[t - 1][i][0],
                        w * velocities[t - 1][i][1]]
-            cogComp = [c1 * r1 * (personalBests[i][0] - lastPos[0]),
-                       c1 * r1 * (personalBests[i][1] - lastPos[1])]
-            socComp = [c2 * r2 * (globalBest[0] - lastPos[0]),
-                       c2 * r2 * (globalBest[1] - lastPos[1])]
+            cogComp = [cC * r1 * (personalBests[i][0] - lastPos[0]),
+                       cC * r1 * (personalBests[i][1] - lastPos[1])]
+            socComp = [cS * r2 * (globalBest[0] - lastPos[0]),
+                       cS * r2 * (globalBest[1] - lastPos[1])]
             newVel = [origVel[0] + cogComp[0] + socComp[0],
                       origVel[1] + cogComp[1] + socComp[1]]
 
@@ -128,6 +128,22 @@ def standardParticleSwarmOptimization(func, c1=0.1, c2=0.1, w=0.1):
         t = t + 1
 
     return particles, velocities
+
+
+def stepsBetweenPositions(particles):
+    smooth = []
+
+    for i in range(len(particles[0])):  # for each particle
+        smooth.append([])
+        smooth[i].append(particles[0][i])  # add the very first position to the smoothSteps array
+        for j in range(ITERATIONS - 1):
+            currentPos = particles[j][i]
+            nextPos = particles[j + 1][i]
+            smoothVectors = np.linspace(currentPos, nextPos, STEPSPERIT + 1)
+            for s in smoothVectors[1:]:
+                smooth[i].append(s)
+
+    return smooth
 
 
 def rosenbrock_function(x, y):
@@ -155,30 +171,28 @@ def quadratic_function(x, y):
 def ackley_function(x, y):
     c_x = 1.5  # Coefficient for the x term
     c_y = 0.8  # Coefficient for the y term
-    term1 = -20 * np.exp(-0.2 * np.sqrt(0.5 * (c_x * x**2 + c_y * y**2)))
+    term1 = -20 * np.exp(-0.2 * np.sqrt(0.5 * (c_x * x ** 2 + c_y * y ** 2)))
     term2 = -np.exp(0.5 * (np.cos(2 * np.pi * c_x * x) + np.cos(2 * np.pi * c_y * y)))
     term3 = np.exp(1) + 20
     return term1 + term2 + term3
 
 
 def himmelblau_function(x, y):
-    term1 = (x**2 + y - 11)**2
-    term2 = (x + y**2 - 7)**2
+    term1 = (x ** 2 + y - 11) ** 2
+    term2 = (x + y ** 2 - 7) ** 2
     return term1 + term2
 
-def other_function(x,y):
+
+def other_function(x, y):
     return np.sin(x) + np.cos(y)
 
 
+def generate_steps_between_vectors(start_vector, end_vector, num_steps):
+    steps = np.linspace(start_vector, end_vector, num_steps)
+    return steps
+
+
 if __name__ == '__main__':
-    # positions of particles
-    X = [1, 2, 3, 4]
-    Y = [5, 2, 8, 1]
-
-    # velocities of particles
-    xVel = [1, 2, 3, -2]
-    yVel = [2, 5, -3, 0]
-
     # selectedFunc = rastrigin_function
     # selectedFunc = rosenbrock_function
     # selectedFunc = quadratic_function
@@ -186,5 +200,6 @@ if __name__ == '__main__':
     # selectedFunc = himmelblau_function
     selectedFunc = other_function
     pos, vel = standardParticleSwarmOptimization(selectedFunc)
+    smoothSteps = stepsBetweenPositions(pos)  # adds extra frames to make the animation more smooth
     print("done computing, starting rendering now")
-    renderPlot(pos, vel, selectedFunc)
+    renderPlot(smoothSteps, vel, selectedFunc)
