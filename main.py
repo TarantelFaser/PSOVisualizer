@@ -1,6 +1,4 @@
-import math
 import random
-
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
@@ -13,6 +11,8 @@ ITERATIONS = 50  # actual iterations of the algorithm
 STEPSPERIT = 5  # number of substeps animated between two actual iterations of the algorithm
 VMAXFACTOR = 0.1
 PARTPERAXIS = 8  # number of particles spread along one axis, total number will be this number squared
+
+# TODO fix particles, damit sie nicht alle an der Diagonalen kleben
 
 
 # takes arrays of coordinates of particles and the velocities
