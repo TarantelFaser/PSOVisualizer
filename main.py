@@ -12,7 +12,7 @@ STEPSPERIT = 5  # number of substeps animated between two actual iterations of t
 VMAXFACTOR = 0.1
 PARTPERAXIS = 8  # number of particles spread along one axis, total number will be this number squared
 
-# TODO fix particles, damit sie nicht alle an der Diagonalen kleben
+# TODO gefundenes globales optimum anzeigen
 
 
 # takes arrays of coordinates of particles and the velocities
@@ -36,7 +36,7 @@ def renderPlot(pos, vel, func, str):
         ax.set_title('Particle Swarm Optimization')
         ax.set_aspect('equal')
         ax.axis([AXISMIN, AXISMAX, AXISMIN, AXISMAX])
-        plt.text(8, 8, str, bbox=dict(facecolor='white', alpha=0.5), fontsize=8)
+        plt.text(8, 10, str, bbox=dict(facecolor='white', alpha=0.5), fontsize=8)
 
         points = []
         for j in range(len(pos)):  # for each particle
@@ -66,7 +66,7 @@ def getClampedVel(newVel, delta=VMAXFACTOR):
         return newVel
 
 
-def standardParticleSwarmOptimization(func, cC=0.6, cS=1.5, w=0.5):
+def standardParticleSwarmOptimization(func, cC=1.49, cS=1.49, w=0.5):
     particles = []  # in the first element is the positional data of all the particles in the first iteration
     velocities = []
     personalBests = []
@@ -201,9 +201,9 @@ if __name__ == '__main__':
     # selectedFunc = rastrigin_function
     # selectedFunc = rosenbrock_function
     # selectedFunc = quadratic_function
-    selectedFunc = ackley_function
+    # selectedFunc = ackley_function
     # selectedFunc = himmelblau_function
-    # selectedFunc = other_function
+    selectedFunc = other_function
     pos, vel, text = standardParticleSwarmOptimization(selectedFunc)
     smoothSteps = stepsBetweenPositions(pos)  # adds extra frames to make the animation more smooth
     print("done computing, starting rendering now")
