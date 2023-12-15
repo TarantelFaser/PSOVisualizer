@@ -117,7 +117,9 @@ def standardParticleSwarmOptimization(func, cC=0.6, cS=1.5, w=0.5):
 
             # compute new positions
             particles[t].append(
-                [particles[t - 1][i][1] + velocities[t][i][0], particles[t - 1][i][1] + velocities[t][i][1]])
+                [particles[t - 1][i][0] + velocities[t][i][0],
+                 particles[t - 1][i][1] + velocities[t][i][1]]
+            )
 
             # update personal and global bests
             if func(particles[t][i][0], particles[t][i][1]) < func(personalBests[i][0], personalBests[i][1]):
@@ -197,8 +199,8 @@ if __name__ == '__main__':
     # selectedFunc = rosenbrock_function
     # selectedFunc = quadratic_function
     # selectedFunc = ackley_function
-    # selectedFunc = himmelblau_function
-    selectedFunc = other_function
+    selectedFunc = himmelblau_function
+    # selectedFunc = other_function
     pos, vel = standardParticleSwarmOptimization(selectedFunc)
     smoothSteps = stepsBetweenPositions(pos)  # adds extra frames to make the animation more smooth
     print("done computing, starting rendering now")
