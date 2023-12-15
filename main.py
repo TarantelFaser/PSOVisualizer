@@ -18,7 +18,8 @@ PARTPERAXIS = 8  # number of particles spread along one axis, total number will 
 # takes arrays of coordinates of particles and the velocities
 # and a function and renders the plot
 # pos array contains a subarray for each particle, containing all the positions
-def renderPlot(pos, vel, func):
+# str is a string that should be printed on the diagrams
+def renderPlot(pos, vel, func, str):
     fig, ax = plt.subplots()
     plt.xlabel('X')
     plt.ylabel('Y')
@@ -35,6 +36,7 @@ def renderPlot(pos, vel, func):
         ax.set_title('Particle Swarm Optimization')
         ax.set_aspect('equal')
         ax.axis([AXISMIN, AXISMAX, AXISMIN, AXISMAX])
+        plt.text(8, 8, str, bbox=dict(facecolor='white', alpha=0.5), fontsize=8)
 
         points = []
         for j in range(len(pos)):  # for each particle
@@ -129,7 +131,8 @@ def standardParticleSwarmOptimization(func, cC=0.6, cS=1.5, w=0.5):
 
         t = t + 1
 
-    return particles, velocities
+    textstr = "inertiaWeight = " + str(round(w,2)) + "\ncognitiveComp = " + str(round(cC,2)) + "\nsocComp = " + str(round(cS,2))
+    return particles, velocities, textstr
 
 
 def stepsBetweenPositions(particles):
@@ -198,10 +201,10 @@ if __name__ == '__main__':
     # selectedFunc = rastrigin_function
     # selectedFunc = rosenbrock_function
     # selectedFunc = quadratic_function
-    # selectedFunc = ackley_function
-    selectedFunc = himmelblau_function
+    selectedFunc = ackley_function
+    # selectedFunc = himmelblau_function
     # selectedFunc = other_function
-    pos, vel = standardParticleSwarmOptimization(selectedFunc)
+    pos, vel, text = standardParticleSwarmOptimization(selectedFunc)
     smoothSteps = stepsBetweenPositions(pos)  # adds extra frames to make the animation more smooth
     print("done computing, starting rendering now")
-    renderPlot(smoothSteps, vel, selectedFunc)
+    renderPlot(smoothSteps, vel, selectedFunc, text)
