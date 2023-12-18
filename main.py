@@ -6,9 +6,9 @@ from matplotlib.animation import FuncAnimation, PillowWriter
 AXISMIN = -10
 AXISMAX = 10
 DOTS = AXISMAX * 10
-FPS = 25
-ITERATIONS = 50  # actual iterations of the algorithm
-STEPSPERIT = 5  # number of substeps animated between two actual iterations of the algorithm
+FPS = 35
+ITERATIONS = 60  # actual iterations of the algorithm
+STEPSPERIT = 8  # number of substeps animated between two actual iterations of the algorithm
 VMAXFACTOR = 0.1
 PARTPERAXIS = 8  # number of particles spread along one axis, total number will be this number squared
 
@@ -36,11 +36,13 @@ def renderPlot(pos, vel, func, str):
         ax.set_title('Particle Swarm Optimization')
         ax.set_aspect('equal')
         ax.axis([AXISMIN, AXISMAX, AXISMIN, AXISMAX])
-        plt.text(8, 10, str, bbox=dict(facecolor='white', alpha=0.5), fontsize=8)
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.text(7, 11, str, bbox=dict(facecolor='white', alpha=0.75), fontsize=6)
 
         points = []
         for j in range(len(pos)):  # for each particle
-            p = ax.plot(pos[j][i][0], pos[j][i][1], marker='X', color='red')  # draws the moving point
+            p = ax.plot(pos[j][i][0], pos[j][i][1], marker='x', color='#b80012')  # draws the moving point
             points.append(p)
         print(f'\r{round((i*100) / ((ITERATIONS - 1) * STEPSPERIT), 1)}%')
         return points
