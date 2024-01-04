@@ -3,16 +3,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation, PillowWriter
 
+# defines the rendered square
 AXISMIN = -10
 AXISMAX = 10
-DOTS = AXISMAX * 10
-FPS = 35
-ITERATIONS = 60  # actual iterations of the algorithm
-STEPSPERIT = 8  # number of substeps animated between two actual iterations of the algorithm
-VMAXFACTOR = 0.1
-PARTPERAXIS = 8  # number of particles spread along one axis, total number will be this number squared
 
-# TODO gefundenes globales optimum anzeigen
+STEPSPERIT = 8  # number of substeps animated between two actual iterations of the algorithm
+
+ITERATIONS = 40  # actual iterations of the algorithm
+PARTPERAXIS = 5  # number of particles spread along one axis, total number will be this number squared
 
 
 # takes arrays of coordinates of particles and the velocities
@@ -25,8 +23,8 @@ def renderPlot(pos, vel, func, str):
     plt.ylabel('Y')
 
     # get the contour plot for the function (func : R^2 -> R)
-    xf = np.linspace(AXISMIN, AXISMAX, DOTS)
-    yf = np.linspace(AXISMIN, AXISMAX, DOTS)
+    xf = np.linspace(AXISMIN, AXISMAX, AXISMAX * 10)
+    yf = np.linspace(AXISMIN, AXISMAX, AXISMAX * 10)
     Xf, Yf = np.meshgrid(xf, yf)
 
     # gets called with i as the frame number
@@ -38,17 +36,17 @@ def renderPlot(pos, vel, func, str):
         ax.axis([AXISMIN, AXISMAX, AXISMIN, AXISMAX])
         plt.xlabel('X')
         plt.ylabel('Y')
-        plt.text(7, 11, str, bbox=dict(facecolor='white', alpha=0.75), fontsize=6)
+        plt.text(AXISMAX, AXISMAX, str, bbox=dict(facecolor='white', alpha=0.75), fontsize=6)
 
         points = []
         for j in range(len(pos)):  # for each particle
-            p = ax.plot(pos[j][i][0], pos[j][i][1], marker='x', color='#b80012')  # draws the moving point
+            p = ax.plot(pos[j][i][0], pos[j][i][1], marker='X', color='#b80012')  # draws the moving point
             points.append(p)
         print(f'\r{round((i*100) / ((ITERATIONS - 1) * STEPSPERIT), 1)}%')
         return points
 
     ani = FuncAnimation(fig, animate, interval=40, blit=False, repeat=True, frames=(ITERATIONS - 1) * STEPSPERIT)
-    ani.save("TLI.gif", dpi=300, writer=PillowWriter(fps=FPS))
+    ani.save("TLI.gif", dpi=300, writer=PillowWriter(fps=35))
     print("Animation saved")
 
 
@@ -56,7 +54,7 @@ def getLengthOfVector(ar):
     return np.sqrt(ar[0] ** 2 + ar[1] ** 2)
 
 
-def getClampedVel(newVel, delta=VMAXFACTOR):
+def getClampedVel(newVel, delta=0.25):
     vMaxValue = delta * (np.abs(AXISMAX) + np.abs(AXISMIN))  # max allowed velocity
     newVelValue = getLengthOfVector(newVel)  # value / betrag of new calculated velocity
 
@@ -68,7 +66,7 @@ def getClampedVel(newVel, delta=VMAXFACTOR):
         return newVel
 
 
-def standardParticleSwarmOptimization(func, cC=1.49, cS=1.49, w=0.5):
+def standardParticleSwarmOptimization(func, cC=1, cS=1, w=1):
     particles = []  # in the first element is the positional data of all the particles in the first iteration
     velocities = []
     personalBests = []
@@ -133,7 +131,7 @@ def standardParticleSwarmOptimization(func, cC=1.49, cS=1.49, w=0.5):
 
         t = t + 1
 
-    textstr = "inertiaWeight = " + str(round(w,2)) + "\ncognitiveComp = " + str(round(cC,2)) + "\nsocComp = " + str(round(cS,2))
+    textstr = "inertiaWeight = " + str(round(w,2)) + "\ncognitiveComp = " + str(round(cC,2)) + "\nsocComp = " + str(round(cS,2)) + "\nglobalBest = [" + str(round(globalBest[0], 2)) + ", " + str(round(globalBest[1], 2)) + "]"
     return particles, velocities, textstr
 
 
