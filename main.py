@@ -10,14 +10,14 @@ AXISMAX = 10
 STEPSPERIT = 8  # number of substeps animated between two actual iterations of the algorithm
 
 ITERATIONS = 40  # actual iterations of the algorithm
-PARTPERAXIS = 5  # number of particles spread along one axis, total number will be this number squared
+PARTPERAXIS = 6  # number of particles spread along one axis, total number will be this number squared
 
 
 # takes arrays of coordinates of particles and the velocities
 # and a function and renders the plot
 # pos array contains a subarray for each particle, containing all the positions
 # str is a string that should be printed on the diagrams
-def renderPlot(pos, vel, func, str):
+def renderPlot(pos, func, str):
     fig, ax = plt.subplots()
     plt.xlabel('X')
     plt.ylabel('Y')
@@ -79,7 +79,7 @@ def standardParticleSwarmOptimization(func, cC=1, cS=1, w=1):
 
     # initialize positions
     step = (np.abs(AXISMIN) + np.abs(AXISMAX)) / PARTPERAXIS
-    x, y = np.arange(AXISMIN, AXISMAX, step), np.arange(AXISMIN, AXISMAX, step)
+    x, y = np.arange(AXISMIN, AXISMAX+1, step), np.arange(AXISMIN, AXISMAX+1, step)
     partCount = 0
     for a in x:
         for b in y:
@@ -207,4 +207,4 @@ if __name__ == '__main__':
     pos, vel, text = standardParticleSwarmOptimization(selectedFunc)
     smoothSteps = stepsBetweenPositions(pos)  # adds extra frames to make the animation more smooth
     print("done computing, starting rendering now")
-    renderPlot(smoothSteps, vel, selectedFunc, text)
+    renderPlot(smoothSteps, selectedFunc, text)
